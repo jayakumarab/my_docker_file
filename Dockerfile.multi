@@ -1,0 +1,26 @@
+# Stage 1: Builder
+FROM python:3.10 AS builder
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+
+# Stage 2: Final
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Copy requirements again
+COPY requirements.txt .
+
+# Install dependencies again in final image
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app code
+COPY --from=builder /app /app
+
+CMD ["python", "app.py"]
